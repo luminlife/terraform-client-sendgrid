@@ -248,7 +248,12 @@ func processEmptyResponse(response *rest.Response) error {
 	fmt.Println(response.StatusCode)
 	fmt.Println(response.Body)
 	if response.StatusCode >= 300 {
-		return fmt.Errorf("Error calling API: status code: %d", response.StatusCode)
+		var body map[string]interface{}
+		var errorStr string
+
+		json.Unmarshal([]byte(response.Body), &body)
+		errorStr = body["error"].(string)
+		return fmt.Errorf("Error calling API: status code: %d, %s", response.StatusCode, errorStr)
 	}
 	return nil
 }
